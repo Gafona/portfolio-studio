@@ -1,0 +1,190 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// This security rules file assumes the following Cloud Firestore data structures:
+//
+// Collection: site
+// Document ID: portfolio (single public portfolio document)
+// Fields:
+//   - profile: map (required, <= 100 keys) - public portfolio owner profile & contact info
+//   - appearance: map (required, <= 100 keys) - theme, layout, backdrop, CV & sticker settings
+//   - version: int (required, 0..10000) - schema version integer
+//   - updatedAt: string (required, 1..64 chars) - ISO 8601 last-updated timestamp string
+//   - skills: list (optional, <= 100 items) - grouped skill entries
+//   - experiences: list (optional, <= 100 items) - work & community experience entries
+//   - projects: list (optional, <= 100 items) - portfolio & CV project entries
+//   - achievements: list (optional, <= 100 items) - awards, certificates & milestones
+//   - education: list (optional, <= 100 items) - education entries
+//   - studioAccess: map (optional, <= 5 keys) - optional Studio access metadata
+//
+// Collection: assets
+// Document ID: {assetId} (referenced in portfolio data as fb-asset://<assetId>)
+// Fields:
+//   - ownerUid: string (required, immutable, 1..128 chars) - Firebase Auth UID of uploader
+//   - dataUrl: string (required, 1..900000 chars) - compressed base64 image Data URL
+//   - contentType: string (required, 1..64 chars, matches '^image/.*') - image MIME type
+//   - sizeBytes: int (required, 1..900000) - payload byte/char length under 1 MiB doc limit
+//   - updatedAt: string (required, 1..64 chars) - ISO 8601 upload timestamp string
+//   - filename: string (optional, 1..255 chars) - original image filename
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Check if the request comes from a signed-in Firebase Auth user.
+    // Note: Do not require email_verified because admin-created Email/Password
+    // accounts in Firebase Console start with email_verified == false.
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the authenticated user's UID matches the given userId.
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Check if the authenticated user owns the existing asset document.
+    function isAssetOwner() {
+      return resource != null &&
+             'ownerUid' in resource.data &&
+             isOwner(resource.data.ownerUid);
+    }
+
+    // Verify ownerUid on asset create matches the caller's UID.
+    function ownerUidUnchanged() {
+      return 'ownerUid' in request.resource.data &&
+             isOwner(request.resource.data.ownerUid);
+    }
+
+    // Ensure ownerUid cannot be reassigned on asset update.
+    function ownerUidNotModified() {
+      return 'ownerUid' in request.resource.data &&
+             resource != null &&
+             'ownerUid' in resource.data &&
+             request.resource.data.ownerUid == resource.data.ownerUid;
+    }
+
+    // Validate required top-level fields exist on the incoming document.
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // Reject arbitrary undefined top-level fields (strict schema enforcement).
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // Validate a non-empty string within an upper length bound.
+    function validStringLength(value, minLen, maxLen) {
+      return value is string &&
+             value.size() >= minLen &&
+             value.size() <= maxLen;
+    }
+
+    // ===============================================================
+    // Domain Validators (Applied on both create and update)
+    // ===============================================================
+
+    // Validate the single /site/portfolio document without over-constraining
+    // optional nested properties inside profile or appearance maps.
+    function isValidPortfolio(data) {
+      return hasRequiredFields(['profile', 'appearance', 'version', 'updatedAt']) &&
+             hasOnlyAllowedFields([
+               'version',
+               'updatedAt',
+               'profile',
+               'skills',
+               'experiences',
+               'projects',
+               'achievements',
+               'education',
+               'appearance',
+               'studioAccess'
+             ]) &&
+             data.profile is map &&
+             data.profile.size() <= 100 &&
+             data.appearance is map &&
+             data.appearance.size() <= 100 &&
+             data.version is int &&
+             data.version >= 0 &&
+             data.version <= 10000 &&
+             validStringLength(data.updatedAt, 1, 64) &&
+             (!('skills' in data) || (data.skills is list && data.skills.size() <= 100)) &&
+             (!('experiences' in data) || (data.experiences is list && data.experiences.size() <= 100)) &&
+             (!('projects' in data) || (data.projects is list && data.projects.size() <= 100)) &&
+             (!('achievements' in data) || (data.achievements is list && data.achievements.size() <= 100)) &&
+             (!('education' in data) || (data.education is list && data.education.size() <= 100)) &&
+             (!('studioAccess' in data) || (data.studioAccess is map && data.studioAccess.size() <= 5));
+    }
+
+    // Validate compressed Spark-free image asset documents in /assets/{assetId}.
+    function isValidAsset(data) {
+      return hasRequiredFields([
+               'ownerUid',
+               'dataUrl',
+               'contentType',
+               'sizeBytes',
+               'updatedAt'
+             ]) &&
+             hasOnlyAllowedFields([
+               'ownerUid',
+               'filename',
+               'contentType',
+               'sizeBytes',
+               'dataUrl',
+               'updatedAt'
+             ]) &&
+             validStringLength(data.ownerUid, 1, 128) &&
+             validStringLength(data.dataUrl, 1, 900000) &&
+             validStringLength(data.contentType, 1, 64) &&
+             data.contentType.matches('^image/.*') &&
+             data.sizeBytes is int &&
+             data.sizeBytes > 0 &&
+             data.sizeBytes <= 900000 &&
+             validStringLength(data.updatedAt, 1, 64) &&
+             (!('filename' in data) || validStringLength(data.filename, 1, 255));
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    // 1. Single public portfolio document (/site/portfolio)
+    //    Public single-document get only; collection listing and deletion denied.
+    match /site/portfolio {
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isAuthenticated() &&
+                               isValidPortfolio(request.resource.data);
+      allow delete: if false;
+    }
+
+    // 2. Spark-free compressed image assets (/assets/{assetId})
+    //    Public single-document get by known ID to resolve fb-asset://<assetId>;
+    //    collection listing denied so visitors cannot enumerate asset IDs.
+    match /assets/{assetId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if isAuthenticated() &&
+                       ownerUidUnchanged() &&
+                       isValidAsset(request.resource.data);
+      allow update: if isAssetOwner() &&
+                       ownerUidNotModified() &&
+                       isValidAsset(request.resource.data);
+      allow delete: if isAssetOwner();
+    }
+
+    // 3. Default deny on all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

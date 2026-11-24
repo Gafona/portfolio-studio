@@ -1,14 +1,29 @@
 const previewAssetOverrides = new Map<string, string>();
 
 export function registerPreviewAsset(relativePath: string, previewDataUrl: string): void {
-  const normalized = relativePath.trim().replace(/^\/+/, '');
+  const trimmed = relativePath.trim();
+  const normalized = trimmed.replace(/^\/+/, '');
   if (!normalized || !previewDataUrl) return;
+  previewAssetOverrides.set(trimmed, previewDataUrl);
   previewAssetOverrides.set(normalized, previewDataUrl);
+}
+
+export function hasPreviewAsset(src?: string): boolean {
+  const trimmed = src?.trim() ?? '';
+  if (!trimmed) return false;
+  const normalizedSrc = trimmed.replace(/^\/+/, '');
+  return previewAssetOverrides.has(trimmed) || previewAssetOverrides.has(normalizedSrc);
 }
 
 export function resolveAssetUrl(src?: string): string {
   const trimmed = src?.trim() ?? '';
   if (!trimmed) return '';
+
+  const exactPreview = previewAssetOverrides.get(trimmed);
+  if (exactPreview) {
+    return exactPreview;
+  }
+
   if (
     trimmed.startsWith('http://') ||
     trimmed.startsWith('https://') ||
@@ -22,6 +37,10 @@ export function resolveAssetUrl(src?: string): string {
   const immediatePreview = previewAssetOverrides.get(normalizedSrc);
   if (immediatePreview) {
     return immediatePreview;
+  }
+
+  if (trimmed.startsWith('fb-asset://')) {
+    return '';
   }
 
   const base = (typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL) || '/';

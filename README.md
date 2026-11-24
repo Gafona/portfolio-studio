@@ -1,29 +1,54 @@
 # Trang Cá Nhân: Giới Thiệu • Portfolio Timeline • CV A4 & Studio
 
-Website hồ sơ cá nhân gọn nhẹ, mã nguồn sạch, không cần backend hay database — phù hợp cho **bất kỳ ngành nghề nào** (thiết kế, truyền thông, kinh doanh, giảng dạy, kỹ thuật, sáng tạo nội dung...).
+Website hồ sơ cá nhân gọn nhẹ, mã nguồn sạch — phù hợp cho **bất kỳ ngành nghề nào** (thiết kế, truyền thông, kinh doanh, giảng dạy, kỹ thuật, sáng tạo nội dung...).
 
-Dữ liệu tập trung tại một tệp duy nhất (`src/data/portfolio.json`), hiển thị ra **2 không gian công khai tách biệt**:
+Dữ liệu hiển thị ra **2 không gian công khai tách biệt**:
 1. **Giới thiệu & Portfolio Timeline (`#/home`)**: Giao diện *Bầu trời & Sao* (ưu tiên **Chế độ Tối** làm mặc định, có công tắc chuyển Sáng/Tối ở góc trên) kết hợp giới thiệu bản thân, dòng thời gian dự án/thành tích theo năm, **ảnh nền tùy chỉnh** và **sticker trang trí tự do**.
 2. **CV chuẩn A4 (`#/cv`)**: Trang sơ yếu lý lịch nền trắng tinh gọn tách khỏi giao diện web và không bị dính sticker trang trí, hỗ trợ 3 mẫu (*Classic*, *Modern Split*, *Executive*) và xuất PDF / in trực tiếp chuẩn A4.
 
 ---
 
-## Truy cập & Tự cập nhật ngay trên Web (1 chạm — Không cần đụng code)
+## Cách 1 (Khuyên dùng cho người không rành kỹ thuật): Triển khai lên Firebase Miễn Phí (Spark Plan)
 
-Thanh điều hướng phía trên của website công khai **không hiển thị nút Studio**.
+Với Firebase Spark (miễn phí **không cần thẻ tín dụng**), người dùng cuối (như chị gái bạn) chỉ cần mở link web, cuộn xuống cuối trang **nhập mật khẩu Studio**, sửa chữ/up ảnh/kéo sticker và bấm **`Lưu lên Web`** — trang web cập nhật **tức thì dưới 1 giây**, hoàn toàn không cần Token hay GitHub.
 
-- **Cách mở Studio:** Cuộn xuống **dưới cùng chân trang (Footer)** → nhập mật khẩu vào ô **Mật khẩu Studio** → nhấn **Vào Studio**.
-- **Mật khẩu tạm ban đầu:** `17181910` (sau khi vào Studio, mở **Dữ liệu → Mật khẩu truy cập Studio** để đặt mật khẩu riêng; hệ thống lưu mã băm `SHA-256` vào `src/data/portfolio.json`).
-- **Đăng cập nhật trực tiếp từ Studio lên Web (không cần mở code hay Git):**
-  1. Trong Studio, mở mục **Dữ liệu → Kết nối đăng web trực tiếp (1 chạm)**.
-  2. Điền tên tài khoản GitHub, tên kho (VD: `phuongthao`), nhánh `main` và dán **GitHub Fine-grained Token** (quyền *Contents: Read and write* giới hạn riêng cho kho đó — Token chỉ lưu cục bộ trong trình duyệt máy của bạn, không bao giờ ghi vào file công khai).
-  3. Từ đó về sau mỗi lần sửa chữ, thêm dự án, tải ảnh (lưu vào `public/uploads/`) hoặc kéo thả sticker, bạn chỉ cần nhấn nút **Đăng lên Web** (`Ctrl+S`) ở góc trên bên phải — GitHub Actions sẽ tự động làm mới trang web sau ~45–60 giây.
-
-> **Dùng cho nhiều người / 2 ngành khác nhau:** Nhân bản dự án thành kho riêng, vào Studio → **Dữ liệu → Bắt đầu hồ sơ trống** để tự điền thông tin cho bất kỳ ngành nghề nào.
+### Thiết lập 1 lần mất ~5 phút:
+1. **Tạo dự án Firebase:** Mở [console.firebase.google.com](https://console.firebase.google.com/) → **Create a project** (đặt tên/ID tuỳ ý, VD: `phuongthao`, có thể tắt Google Analytics cho nhanh).
+2. **Bật đăng nhập bằng Mật khẩu:** Vào **Authentication → Sign-in method** → bật **Email/Password** → sang tab **Users → Add user**:
+   - Email: `studio@phuongthao.app` *(khớp `VITE_FIREBASE_STUDIO_EMAIL`)*
+   - Password tạm: `17181910`
+3. **Tạo cơ sở dữ liệu Firestore (Standard):** Vào **Firestore Database → Create database** → chọn **Standard edition** → chọn vùng gần Việt Nam (VD: `asia-southeast1` Singapore) → chọn **Start in production mode**.
+4. **Điền cấu hình vào `.env.local`:** Vào **Project settings (bánh răng) → Your apps → Web (`</>`)** đăng ký 1 Web App → chép 6 giá trị `firebaseConfig` vào file `.env.local` ở thư mục dự án (dựa theo `.env.example`):
+   ```env
+   VITE_FIREBASE_API_KEY=...
+   VITE_FIREBASE_AUTH_DOMAIN=...
+   VITE_FIREBASE_PROJECT_ID=...
+   VITE_FIREBASE_STORAGE_BUCKET=...
+   VITE_FIREBASE_MESSAGING_SENDER_ID=...
+   VITE_FIREBASE_APP_ID=...
+   VITE_FIREBASE_STUDIO_EMAIL=studio@phuongthao.app
+   ```
+   *(Lưu ý: `.env.local` đã nằm trong `.gitignore`, không bị đẩy lên Git công khai).*
+5. **Đẩy web & quy tắc bảo mật lên Firebase:**
+   ```bash
+   npx.cmd firebase-tools login
+   npx.cmd firebase-tools use <project-id-cua-ban>
+   npm.cmd run deploy:firebase
+   ```
+   Xong bước này, trang web chạy chính thức tại `https://<project-id-cua-ban>.web.app`!
 
 ---
 
-## Chỉnh sửa trên máy cá nhân (tùy chọn cho lập trình viên)
+## Cách 2: Chạy tĩnh trên GitHub Pages
+
+Khi không cấu hình Firebase env (`.env.local` rỗng), ứng dụng tự dùng `src/data/portfolio.json`, hỗ trợ đăng nhập bằng mật khẩu tạm `17181910` (mã băm `SHA-256`) và hỗ trợ kết nối **Đăng lên Web (1 chạm)** bằng GitHub Fine-grained Token trong mục **Dữ liệu**.
+
+- **Đổi link GitHub Pages:** Vào **Settings → General → Repository name** để đổi tên kho (VD: `phuongthao` → `https://gafona.github.io/phuongthao/`).
+- **Gắn tên miền riêng (`.com`, `.id.vn`...):** Hỗ trợ miễn phí cả trên Firebase Hosting và GitHub Pages.
+
+---
+
+## Chỉnh sửa trên máy cá nhân (tùy chọn)
 
 Yêu cầu: [Node.js](https://nodejs.org/) v20+.
 
@@ -33,12 +58,3 @@ npm run dev
 ```
 
 *(Trên Windows PowerShell nếu bị chặn `npm`, chạy `npm.cmd install` và `npm.cmd run dev`.)*
-
----
-
-## Đẩy lên GitHub & Đổi tên miền (GitHub Pages)
-
-Workflow `.github/workflows/deploy.yml` tự động build (`npm run build`) và phát hành lên GitHub Pages mỗi lần nhánh `main` được cập nhật.
-
-- **Đổi link GitHub Pages (VD thành `https://gafona.github.io/phuongthao/`):** Vào **Settings → General → Repository name** đổi tên repo thành `phuongthao`.
-- **Gắn tên miền riêng (`.com`, `.id.vn`...):** Trỏ DNS về GitHub Pages và nhập tên miền vào **Settings → Pages → Custom domain**.

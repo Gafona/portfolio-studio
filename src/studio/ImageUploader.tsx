@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { ImagePlus, Link2, Loader2, Trash2, UploadCloud } from 'lucide-react';
 import { registerPreviewAsset, resolveAssetUrl } from '../utils/assets';
+import { IS_FIREBASE_CONFIGURED, uploadAssetToFirestore } from '../utils/firebaseService';
 import {
   isGitHubPublishConfigured,
   loadGitHubSyncConfig,
@@ -46,6 +47,22 @@ export function ImageUploader({
       const dataUrl = typeof reader.result === 'string' ? reader.result : '';
       if (!dataUrl) {
         onNotify?.('error', 'Không thể đọc tệp ảnh.');
+        return;
+      }
+
+      if (IS_FIREBASE_CONFIGURED) {
+        setUploading(true);
+        try {
+          const result = await uploadAssetToFirestore(file.name || 'pasted-image.png', dataUrl);
+          if (!result.ok || !result.path) {
+            onNotify?.('error', result.error ?? 'Tải ảnh lên Firebase thất bại.');
+            return;
+          }
+          onChange(result.path);
+          onNotify?.('success', 'Đã tải ảnh lên Firebase! Nhấn "Lưu lên Web" khi chỉnh xong.');
+        } finally {
+          setUploading(false);
+        }
         return;
       }
 

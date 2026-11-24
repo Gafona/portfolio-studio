@@ -8,6 +8,12 @@ import { consumeStudioFlashMessage, usePortfolioStore } from './hooks/usePortfol
 import { CvPage } from './pages/CvPage';
 import { HomePage } from './pages/HomePage';
 import {
+  IS_FIREBASE_CONFIGURED,
+  signInStudioWithFirebase,
+  signOutStudioFirebase,
+  subscribeFirebaseStudioAuth,
+} from './utils/firebaseService';
+import {
   isStudioSessionUnlocked,
   setStudioSessionUnlocked,
   verifyStudioPassword,
@@ -27,6 +33,8 @@ export function App() {
     effectiveMode,
     isDirty,
     isSaving,
+    assetRevision,
+    isFirebaseEnabled,
     canSaveLocally,
     canPublishToGitHub,
     githubConfig,
@@ -71,9 +79,32 @@ export function App() {
     [],
   );
 
+  useEffect(() => {
+    if (!IS_FIREBASE_CONFIGURED) return;
+    return subscribeFirebaseStudioAuth((signedIn) => {
+      setStudioUnlocked(signedIn);
+      setStudioSessionUnlocked(signedIn);
+    });
+  }, []);
+
   const handleUnlockStudio = useCallback(
     async (password: string): Promise<boolean> => {
       if (!IS_STUDIO_ENABLED) return false;
+      if (IS_FIREBASE_CONFIGURED) {
+        const res = await signInStudioWithFirebase(password);
+        if (!res.ok) {
+          if (res.message && !res.message.includes('chưa đúng')) {
+            notify('error', res.message);
+          }
+          return false;
+        }
+        setStudioSessionUnlocked(true);
+        setStudioUnlocked(true);
+        navigate('studio');
+        notify('success', 'Đã mở khóa Studio (Firebase)');
+        return true;
+      }
+
       const ok = await verifyStudioPassword(password, data.studioAccess?.passwordHash);
       if (!ok) return false;
       setStudioSessionUnlocked(true);
@@ -86,6 +117,9 @@ export function App() {
   );
 
   const handleLockStudio = useCallback(() => {
+    if (IS_FIREBASE_CONFIGURED) {
+      void signOutStudioFirebase();
+    }
     setStudioSessionUnlocked(false);
     setStudioUnlocked(false);
     navigate('home');
@@ -146,6 +180,8 @@ export function App() {
             data={data}
             isDirty={isDirty}
             isSaving={isSaving}
+            assetRevision={assetRevision}
+            isFirebaseEnabled={isFirebaseEnabled}
             canSaveLocally={canSaveLocally}
             canPublishToGitHub={canPublishToGitHub}
             githubConfig={githubConfig}
@@ -175,7 +211,10 @@ export function App() {
   const overDarkSky = Boolean(skyAsset?.isDarkHero);
 
   return (
-    <div className="font-body sky-page-canvas flex min-h-screen flex-col transition-colors">
+    <div
+      data-asset-rev={assetRevision}
+      className="font-body sky-page-canvas flex min-h-screen flex-col transition-colors"
+    >
       <Navbar
         profile={data.profile}
         route={route}

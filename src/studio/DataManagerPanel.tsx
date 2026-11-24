@@ -13,12 +13,17 @@ import {
   Upload,
 } from 'lucide-react';
 import type { PortfolioData, StudioSectionId } from '../types/portfolio';
+import {
+  changeFirebaseStudioPassword,
+  getFirebaseProjectId,
+} from '../utils/firebaseService';
 import { testGitHubConnection, type GitHubSyncConfig } from '../utils/githubPublish';
 import { getProfileCompleteness } from '../utils/normalize';
 import { hashStudioPassword, verifyStudioPassword } from '../utils/studioAuth';
 
 interface DataManagerPanelProps {
   data: PortfolioData;
+  isFirebaseEnabled?: boolean;
   canSaveLocally: boolean;
   canPublishToGitHub: boolean;
   githubConfig: GitHubSyncConfig;
@@ -36,6 +41,7 @@ interface DataManagerPanelProps {
 
 export function DataManagerPanel({
   data,
+  isFirebaseEnabled = false,
   canSaveLocally,
   canPublishToGitHub,
   githubConfig,
@@ -105,20 +111,43 @@ export function DataManagerPanel({
     if (pwdUpdating) return;
     setPwdError('');
 
-    const currentValid = await verifyStudioPassword(currentPwd, data.studioAccess?.passwordHash);
-    if (!currentValid) {
-      setPwdError('Mật khẩu hiện tại chưa đúng.');
-      return;
-    }
-
     const nextTrimmed = newPwd.trim();
-    if (nextTrimmed.length < 4) {
-      setPwdError('Mật khẩu mới cần tối thiểu 4 ký tự.');
+    const minLen = isFirebaseEnabled ? 6 : 4;
+    if (nextTrimmed.length < minLen) {
+      setPwdError(`Mật khẩu mới cần tối thiểu ${minLen} ký tự.`);
       return;
     }
 
     if (nextTrimmed !== confirmPwd.trim()) {
       setPwdError('Xác nhận mật khẩu mới chưa khớp.');
+      return;
+    }
+
+    if (isFirebaseEnabled) {
+      if (!currentPwd.trim()) {
+        setPwdError('Vui lòng nhập mật khẩu hiện tại.');
+        return;
+      }
+      setPwdUpdating(true);
+      try {
+        const res = await changeFirebaseStudioPassword(currentPwd, nextTrimmed);
+        if (!res.ok) {
+          setPwdError(res.message);
+          return;
+        }
+        setCurrentPwd('');
+        setNewPwd('');
+        setConfirmPwd('');
+        onNotify('success', res.message);
+      } finally {
+        setPwdUpdating(false);
+      }
+      return;
+    }
+
+    const currentValid = await verifyStudioPassword(currentPwd, data.studioAccess?.passwordHash);
+    if (!currentValid) {
+      setPwdError('Mật khẩu hiện tại chưa đúng.');
       return;
     }
 
@@ -213,8 +242,33 @@ export function DataManagerPanel({
         </div>
       </div>
 
-      {/* Direct 1-Click GitHub Web Publishing */}
-      <div className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4">
+      {isFirebaseEnabled ? (
+        <div className="space-y-2 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <h3 className="flex items-center gap-1.5 font-heading text-sm font-bold text-emerald-950">
+                <CloudUpload className="h-4 w-4 text-emerald-600" />
+                Đang đồng bộ trực tiếp với Firebase
+              </h3>
+              <p className="mt-0.5 text-xs text-emerald-800">
+                Chỉ cần sửa thông tin, tải ảnh hoặc kéo sticker rồi nhấn nút{' '}
+                <strong>Lưu lên Web</strong> ở góc trên — trang web cập nhật tức thì dưới 1 giây
+                mà không cần Token hay thao tác kỹ thuật nào.
+              </p>
+            </div>
+            <span className="shrink-0 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-semibold text-white">
+              Trực tuyến
+            </span>
+          </div>
+          {getFirebaseProjectId() && (
+            <p className="font-mono text-[11px] text-emerald-700">
+              Project: {getFirebaseProjectId()}
+            </p>
+          )}
+        </div>
+      ) : (
+        /* Direct 1-Click GitHub Web Publishing */
+        <div className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4">
         <div className="flex items-start justify-between gap-2">
           <div>
             <h3 className="flex items-center gap-1.5 font-heading text-sm font-bold text-zinc-900">
@@ -353,7 +407,8 @@ export function DataManagerPanel({
             </ol>
           )}
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Distribution Stats */}
       <div className="grid grid-cols-2 gap-3">
@@ -510,7 +565,7 @@ export function DataManagerPanel({
                 setNewPwd(e.target.value);
                 if (pwdError) setPwdError('');
               }}
-              placeholder="Mật khẩu mới (>= 4 ký tự)"
+              placeholder={isFirebaseEnabled ? 'Mật khẩu mới (>= 6 ký tự)' : 'Mật khẩu mới (>= 4 ký tự)'}
               autoComplete="new-password"
               className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-900 outline-none focus:border-blue-500"
             />

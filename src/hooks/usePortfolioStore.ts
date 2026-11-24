@@ -2,6 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import bundledData from '../data/portfolio.json';
 import type { PortfolioData, ThemeMode } from '../types/portfolio';
 import {
+  IS_FIREBASE_CONFIGURED,
+  hydrateFirebaseAssets,
+  loadPortfolioFromFirestore,
+  savePortfolioToFirestore,
+} from '../utils/firebaseService';
+import {
   clearGitHubSyncConfig,
   isGitHubPublishConfigured,
   loadGitHubSyncConfig,
@@ -91,7 +97,7 @@ function loadInitialStudioState(): {
 
 export interface SaveResult {
   ok: boolean;
-  destination: 'project' | 'github' | 'local' | 'error';
+  destination: 'firebase' | 'project' | 'github' | 'local' | 'error';
   message: string;
 }
 
@@ -104,6 +110,8 @@ export function usePortfolioStore(studioUnlocked = false) {
   const [isDirty, setIsDirty] = useState<boolean>(initialState.isDirty);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [canSaveLocally, setCanSaveLocally] = useState<boolean>(false);
+  const [isLoadingCloud, setIsLoadingCloud] = useState<boolean>(IS_FIREBASE_CONFIGURED);
+  const [assetRevision, setAssetRevision] = useState<number>(0);
   const [githubConfig, setGithubConfig] = useState<GitHubSyncConfig>(loadGitHubSyncConfig);
   const canPublishToGitHub = isGitHubPublishConfigured(githubConfig);
 
@@ -119,7 +127,7 @@ export function usePortfolioStore(studioUnlocked = false) {
   });
 
   useEffect(() => {
-    if (!IS_STUDIO_ENABLED) return;
+    if (!IS_STUDIO_ENABLED || IS_FIREBASE_CONFIGURED) return;
     let active = true;
 
     fetch('/__studio/health')
@@ -138,6 +146,51 @@ export function usePortfolioStore(studioUnlocked = false) {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!IS_FIREBASE_CONFIGURED) return;
+    let active = true;
+
+    loadPortfolioFromFirestore(getNormalizedBundled())
+      .then(async (cloudData) => {
+        if (!active || !cloudData) return;
+        setSavedSnapshot(clonePortfolioData(cloudData));
+        let hasUnsavedDraft = false;
+        try {
+          hasUnsavedDraft = Boolean(window.localStorage.getItem(DRAFT_STORAGE_KEY));
+        } catch {
+          // Ignore storage error
+        }
+        if (!hasUnsavedDraft) {
+          setDataState(cloudData);
+          setIsDirty(false);
+        }
+        const loadedCount = await hydrateFirebaseAssets(cloudData);
+        if (active && loadedCount > 0) {
+          setAssetRevision((rev) => rev + 1);
+        }
+      })
+      .finally(() => {
+        if (active) setIsLoadingCloud(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!IS_FIREBASE_CONFIGURED) return;
+    let active = true;
+    hydrateFirebaseAssets(data).then((loadedCount) => {
+      if (active && loadedCount > 0) {
+        setAssetRevision((rev) => rev + 1);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [data]);
 
   useEffect(() => {
     if (!IS_STUDIO_ENABLED || !studioUnlocked || !isDirty) return;
@@ -233,6 +286,39 @@ export function usePortfolioStore(studioUnlocked = false) {
         destination: 'error',
         message: 'Studio không hoạt động ở chế độ công khai.',
       };
+    }
+
+    if (IS_FIREBASE_CONFIGURED) {
+      setIsSaving(true);
+      try {
+        const fbRes = await savePortfolioToFirestore(data);
+        if (!fbRes.ok) {
+          return {
+            ok: false,
+            destination: 'error',
+            message: fbRes.message,
+          };
+        }
+        const committed = {
+          ...clonePortfolioData(data),
+          updatedAt: fbRes.updatedAt ?? new Date().toISOString(),
+        };
+        setDataState(committed);
+        setSavedSnapshot(committed);
+        setIsDirty(false);
+        try {
+          window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+        } catch {
+          // Ignore storage errors
+        }
+        return {
+          ok: true,
+          destination: 'firebase',
+          message: fbRes.message,
+        };
+      } finally {
+        setIsSaving(false);
+      }
     }
 
     if (!canSaveLocally) {
@@ -435,6 +521,9 @@ export function usePortfolioStore(studioUnlocked = false) {
     effectiveMode,
     isDirty,
     isSaving,
+    isLoadingCloud,
+    assetRevision,
+    isFirebaseEnabled: IS_FIREBASE_CONFIGURED,
     canSaveLocally,
     canPublishToGitHub,
     githubConfig,

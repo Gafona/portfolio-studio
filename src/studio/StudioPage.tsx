@@ -42,6 +42,8 @@ interface StudioPageProps {
   data: PortfolioData;
   isDirty: boolean;
   isSaving: boolean;
+  assetRevision?: number;
+  isFirebaseEnabled?: boolean;
   canSaveLocally: boolean;
   canPublishToGitHub: boolean;
   githubConfig: GitHubSyncConfig;
@@ -99,6 +101,8 @@ export default function StudioPage({
   data,
   isDirty,
   isSaving,
+  assetRevision = 0,
+  isFirebaseEnabled = false,
   canSaveLocally,
   canPublishToGitHub,
   githubConfig,
@@ -309,7 +313,10 @@ export default function StudioPage({
     viewport === 'mobile' ? Smartphone : viewport === 'tablet' ? Tablet : Laptop;
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-zinc-100 text-zinc-900 print:block print:h-auto print:overflow-visible print:bg-white">
+    <div
+      data-asset-rev={assetRevision}
+      className="flex h-screen flex-col overflow-hidden bg-zinc-100 text-zinc-900 print:block print:h-auto print:overflow-visible print:bg-white"
+    >
       {/* Calm Decluttered Studio Header */}
       <header className="no-print flex items-center justify-between gap-3 border-b border-zinc-200 bg-white px-4 py-2.5">
         <div className="flex items-center gap-2.5">
@@ -326,14 +333,18 @@ export default function StudioPage({
             <span className="font-heading text-sm font-bold text-zinc-900">Studio</span>
             <span
               className={`h-2 w-2 rounded-full ${
-                canSaveLocally || canPublishToGitHub ? 'bg-emerald-500' : 'bg-amber-500'
+                isFirebaseEnabled || canSaveLocally || canPublishToGitHub
+                  ? 'bg-emerald-500'
+                  : 'bg-amber-500'
               }`}
               title={
-                canSaveLocally
-                  ? 'Kết nối dự án cục bộ: Lưu thẳng vào portfolio.json'
-                  : canPublishToGitHub
-                    ? `Đã kết nối GitHub (${githubConfig.owner}/${githubConfig.repo}): bấm Đăng lên Web để cập nhật ngay`
-                    : 'Chế độ trình duyệt: Lưu nháp cục bộ (vào Dữ liệu để bật Đăng lên Web 1 chạm)'
+                isFirebaseEnabled
+                  ? 'Đã kết nối Firebase: bấm Lưu lên Web để cập nhật tức thì'
+                  : canSaveLocally
+                    ? 'Kết nối dự án cục bộ: Lưu thẳng vào portfolio.json'
+                    : canPublishToGitHub
+                      ? `Đã kết nối GitHub (${githubConfig.owner}/${githubConfig.repo}): bấm Đăng lên Web để cập nhật ngay`
+                      : 'Chế độ trình duyệt: Lưu nháp cục bộ (vào Dữ liệu để bật Đăng lên Web 1 chạm)'
               }
             />
           </div>
@@ -418,14 +429,16 @@ export default function StudioPage({
             disabled={isSaving}
             onClick={handleSave}
             title={
-              canSaveLocally
-                ? 'Lưu thay đổi vào dự án (Ctrl+S)'
-                : canPublishToGitHub
-                  ? 'Lưu và xuất bản thẳng lên GitHub Pages (Ctrl+S)'
-                  : 'Lưu bản nháp trình duyệt (Ctrl+S)'
+              isFirebaseEnabled
+                ? 'Lưu & đồng bộ tức thì lên web Firebase (Ctrl+S)'
+                : canSaveLocally
+                  ? 'Lưu thay đổi vào dự án (Ctrl+S)'
+                  : canPublishToGitHub
+                    ? 'Lưu và xuất bản thẳng lên GitHub Pages (Ctrl+S)'
+                    : 'Lưu bản nháp trình duyệt (Ctrl+S)'
             }
             className={`relative ml-1.5 inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold text-white transition disabled:opacity-60 ${
-              !canSaveLocally && canPublishToGitHub
+              isFirebaseEnabled || (!canSaveLocally && canPublishToGitHub)
                 ? 'bg-blue-600 hover:bg-blue-700'
                 : 'bg-zinc-900 hover:bg-zinc-800'
             }`}
@@ -436,7 +449,13 @@ export default function StudioPage({
               <Save className="h-3.5 w-3.5" />
             )}
             <span>
-              {canSaveLocally ? 'Lưu' : canPublishToGitHub ? 'Đăng lên Web' : 'Lưu nháp'}
+              {isFirebaseEnabled
+                ? 'Lưu lên Web'
+                : canSaveLocally
+                  ? 'Lưu'
+                  : canPublishToGitHub
+                    ? 'Đăng lên Web'
+                    : 'Lưu nháp'}
             </span>
             {isDirty && (
               <span
@@ -552,6 +571,7 @@ export default function StudioPage({
             {activeSection === 'data' && (
               <DataManagerPanel
                 data={data}
+                isFirebaseEnabled={isFirebaseEnabled}
                 canSaveLocally={canSaveLocally}
                 canPublishToGitHub={canPublishToGitHub}
                 githubConfig={githubConfig}
