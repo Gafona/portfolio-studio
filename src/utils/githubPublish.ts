@@ -41,8 +41,8 @@ export function detectDefaultGitHubTarget(): {
     }
   }
   return {
-    owner: 'Gafona',
-    repo: 'phuongthao',
+    owner: '',
+    repo: 'portfolio-studio',
     branch: 'main',
   };
 }

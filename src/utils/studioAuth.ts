@@ -3,10 +3,10 @@ export const STUDIO_UNLOCK_SESSION_KEY = 'portfolio_studio_unlocked_v1';
 const PASSWORD_SALT_PREFIX = 'portfolio-studio-v1:';
 
 /**
- * SHA-256 hex digest of `${PASSWORD_SALT_PREFIX}17181910` (temporary default passcode).
+ * SHA-256 hex digest of `${PASSWORD_SALT_PREFIX}00000000` (default passcode).
  */
 export const DEFAULT_STUDIO_PASSWORD_HASH =
-  'c01f4d6f6fefb6506588c95acbbc9ab74b2e40def442ce01aa53248dddebb026';
+  '61e1ecea00cd9f249e45eb38f531c281d849ef0fd3095ac77e3417141415df13';
 
 const SHA256_K = new Uint32Array([
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,

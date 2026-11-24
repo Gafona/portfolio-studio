@@ -41,7 +41,7 @@ export const IS_FIREBASE_CONFIGURED = Boolean(
 );
 
 export function getStudioAuthEmail(): string {
-  return getEnv('VITE_FIREBASE_STUDIO_EMAIL') || 'studio@phuongthao.app';
+  return getEnv('VITE_FIREBASE_STUDIO_EMAIL') || 'studio@portfolio.app';
 }
 
 export function getFirebaseProjectId(): string {

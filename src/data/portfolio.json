@@ -1,285 +1,28 @@
 {
   "version": 7,
-  "updatedAt": "2026-11-24T09:00:00.000Z",
+  "updatedAt": "2026-11-24T00:00:00.000Z",
   "profile": {
-    "fullName": "Nguyễn Minh Anh",
-    "monogram": "MA",
-    "role": "Product & Frontend Developer",
-    "tagline": "Xây dựng giao diện tinh gọn, sản phẩm có chiều sâu trải nghiệm và công cụ tự động hóa cho người dùng cuối.",
+    "fullName": "Tên Của Bạn",
+    "monogram": "ME",
+    "role": "Chức danh / Lĩnh vực của bạn",
+    "tagline": "Viết 1 câu ngắn gọn giới thiệu bản thân hoặc định hướng của bạn.",
     "avatarUrl": "",
-    "location": "TP. Hồ Chí Minh, Việt Nam",
-    "email": "minhanh.dev@example.com",
-    "phone": "0901 234 567",
-    "website": "https://minhanh.dev",
-    "availability": "Sẵn sàng kết nối & trao đổi cơ hội mới",
+    "location": "",
+    "email": "",
+    "phone": "",
+    "website": "",
+    "availability": "",
     "showAvailability": false,
-    "aboutStory": "Mình bắt đầu viết những dòng giao diện đầu tiên từ năm hai đại học vì tò mò cách một ý tưởng trên giấy trở thành sản phẩm ai cũng chạm vào được.\n\nSau hơn 3 năm làm việc giữa Frontend Engineering và Product Design, mình đặc biệt thích biến những bài toán phức tạp thành công cụ nhẹ, rõ ràng và dễ dùng. Ngoài giờ làm việc chính, mình thường xây dựng các side-project mã nguồn mở và chia sẻ kinh nghiệm thiết kế hệ thống giao diện.",
-    "cvSummary": "Frontend & Product Developer với 3+ năm kinh nghiệm xây dựng ứng dụng web hiệu năng cao bằng React, TypeScript và hệ thống Design System. Có kinh nghiệm làm việc trực tiếp với Product/Design để rút ngắn thời gian phát hành sản phẩm và tối ưu trải nghiệm người dùng.",
-    "highlights": [
-      {
-        "id": "hl-1",
-        "label": "Kinh nghiệm thực chiến",
-        "value": "3+ năm"
-      },
-      {
-        "id": "hl-2",
-        "label": "Sản phẩm đã ra mắt",
-        "value": "12+ dự án"
-      },
-      {
-        "id": "hl-3",
-        "label": "Giải thưởng & Chứng nhận",
-        "value": "05 dấu mốc"
-      }
-    ],
-    "socials": [
-      {
-        "id": "soc-1",
-        "label": "GitHub",
-        "url": "https://github.com/example",
-        "platform": "github"
-      },
-      {
-        "id": "soc-2",
-        "label": "LinkedIn",
-        "url": "https://linkedin.com/in/example",
-        "platform": "linkedin"
-      },
-      {
-        "id": "soc-3",
-        "label": "Trang cá nhân",
-        "url": "https://minhanh.dev",
-        "platform": "website"
-      }
-    ]
+    "aboutStory": "",
+    "cvSummary": "",
+    "highlights": [],
+    "socials": []
   },
-  "skills": [
-    {
-      "id": "sk-1",
-      "category": "Frontend & UI",
-      "skills": ["React", "TypeScript", "Next.js", "Tailwind CSS", "HTML5 / CSS3", "Accessibility"],
-      "showInHome": true,
-      "showInCV": true
-    },
-    {
-      "id": "sk-2",
-      "category": "Product & Design",
-      "skills": ["Figma", "Design System", "Prototyping", "UX Writing", "User Flow"],
-      "showInHome": true,
-      "showInCV": true
-    },
-    {
-      "id": "sk-3",
-      "category": "Công cụ & Quy trình",
-      "skills": ["Git / GitHub", "Vite", "Node.js", "REST API", "CI/CD", "Performance Audit"],
-      "showInHome": false,
-      "showInCV": true
-    }
-  ],
-  "experiences": [
-    {
-      "id": "exp-1",
-      "role": "Frontend Engineer",
-      "organization": "Nexus Workspace JSC",
-      "location": "TP. Hồ Chí Minh",
-      "period": "03/2024 – Hiện tại",
-      "type": "Toàn thời gian",
-      "summary": "Chủ trì phát triển bộ giao diện quản lý quy trình làm việc và hệ thống component dùng chung cho 4 sản phẩm nội bộ.",
-      "bullets": [
-        "Xây dựng thư viện UI 45+ component chuẩn hóa bằng React + TypeScript + Tailwind CSS, giảm 35% thời gian dựng màn hình mới.",
-        "Tối ưu bundle và cơ chế render danh sách lớn, cải thiện điểm Lighthouse Performance từ 68 lên 95.",
-        "Phối hợp chặt chẽ với team Product thiết kế luồng onboarding mới giúp tăng tỷ lệ hoàn tất thiết lập lên 24%."
-      ],
-      "tags": ["React", "TypeScript", "Design System", "Performance"],
-      "showInPortfolio": true,
-      "showInCV": true
-    },
-    {
-      "id": "exp-2",
-      "role": "Frontend Developer (Bán thời gian)",
-      "organization": "Kite Digital Studio",
-      "location": "Làm việc từ xa",
-      "period": "06/2023 – 02/2024",
-      "type": "Part-time",
-      "summary": "Phát triển landing page, trang giới thiệu sản phẩm và dashboard báo cáo tương tác cho khách hàng SME.",
-      "bullets": [
-        "Hoàn thành 6 website giới thiệu sản phẩm với tốc độ tải dưới 1.5 giây và tương thích tốt trên di động.",
-        "Chuẩn hóa quy trình bàn giao thiết kế từ Figma sang code sạch, dễ bảo trì."
-      ],
-      "tags": ["Next.js", "Tailwind CSS", "Responsive UI"],
-      "showInPortfolio": false,
-      "showInCV": true
-    },
-    {
-      "id": "exp-3",
-      "role": "Trưởng ban Kỹ thuật & Cộng đồng Web",
-      "organization": "CLB Công nghệ OpenLab",
-      "location": "TP. Hồ Chí Minh",
-      "period": "09/2022 – 05/2024",
-      "type": "Hoạt động cộng đồng",
-      "summary": "Tổ chức workshop thực hành React/UI miễn phí và dẫn dắt nhóm sinh viên phát triển cổng thông tin sự kiện mã nguồn mở.",
-      "bullets": [
-        "Điều phối 8 buổi chia sẻ kỹ thuật với tổng cộng 400+ lượt người tham gia.",
-        "Dẫn dắt nhóm 5 thành viên xây dựng website đăng ký hackathon xử lý 1.200 lượt truy cập đồng thời."
-      ],
-      "tags": ["Mentoring", "Open Source", "Community"],
-      "showInPortfolio": true,
-      "showInCV": true
-    }
-  ],
-  "projects": [
-    {
-      "id": "proj-1",
-      "title": "FolioCraft — Không gian Portfolio & Studio cá nhân",
-      "subtitle": "Web App tự quản lý hồ sơ & xuất CV chuẩn A4",
-      "category": "Product Tool",
-      "period": "2026",
-      "role": "Tác giả & Thiết kế sản phẩm",
-      "thumbnailUrl": "",
-      "galleryUrls": [],
-      "shortDescription": "Ứng dụng cá nhân hóa cho phép tách biệt không gian trưng bày Portfolio và bản CV chuẩn A4 từ chung một nguồn dữ liệu JSON, chỉnh sửa trực tiếp không cần backend.",
-      "cvSummary": "Xây dựng ứng dụng Portfolio + Studio chỉnh sửa nội dung cục bộ (React, TypeScript, Vite) cho phép xuất CV khổ A4 và deploy tĩnh qua GitHub Pages.",
-      "caseStudy": {
-        "problem": "Người làm sản phẩm thường phải cập nhật thông tin rời rạc giữa trang giới thiệu, Portfolio trực quan và file CV Word/PDF mỗi khi có thành tích mới.",
-        "solution": "Thiết kế kiến trúc một kho dữ liệu duy nhất với công tắc phân luồng độc lập cho Portfolio và CV, tích hợp Studio xem trước trực tiếp ngay trên máy cá nhân.",
-        "impact": "Giảm thời gian cập nhật hồ sơ xuống dưới 2 phút, mã nguồn gọn nhẹ và hoàn toàn miễn phí vận hành khi public lên GitHub Pages hoặc Vercel."
-      },
-      "tags": ["React", "TypeScript", "Tailwind CSS", "Vite"],
-      "liveUrl": "https://minhanh.dev",
-      "repoUrl": "https://github.com/example/foliocraft",
-      "featured": true,
-      "showInPortfolio": true,
-      "showInCV": true
-    },
-    {
-      "id": "proj-2",
-      "title": "PulseNote — Sổ tay ghi chú nhanh cho Designer & Dev",
-      "subtitle": "Ứng dụng ghi chú markdown tối giản chạy offline-first",
-      "category": "Web App",
-      "period": "2025",
-      "role": "Frontend & UX Lead",
-      "thumbnailUrl": "",
-      "galleryUrls": [],
-      "shortDescription": "Trình ghi chú hỗ trợ tìm kiếm tức thì bằng phím tắt, lưu trữ ngoại tuyến và đồng bộ bản sao JSON gọn nhẹ.",
-      "cvSummary": "Phát triển web app ghi chú offline-first với bộ tìm kiếm nhanh và hỗ trợ phím tắt toàn cục bằng React & IndexedDB.",
-      "caseStudy": {
-        "problem": "Các ứng dụng ghi chú truyền thống khởi động chậm và quá nhiều menu gây xao nhãng khi cần lưu nhanh snippet code hoặc ý tưởng thiết kế.",
-        "solution": "Tập trung vào giao diện 1 khung viết sạch sẽ, thanh command palette (Ctrl+K) và bộ nhớ cục bộ IndexedDB phản hồi dưới 16ms.",
-        "impact": "Đạt 650+ lượt sao trên GitHub và được hơn 180 người dùng cài đặt làm trang ghi chú hàng ngày."
-      },
-      "tags": ["TypeScript", "IndexedDB", "Command Palette", "UI/UX"],
-      "liveUrl": "https://minhanh.dev",
-      "repoUrl": "https://github.com/example/pulsenote",
-      "featured": true,
-      "showInPortfolio": true,
-      "showInCV": true
-    },
-    {
-      "id": "proj-3",
-      "title": "VNColorKit — Bộ bảng màu chuẩn tương phản WCAG",
-      "subtitle": "Công cụ chọn màu giao diện hỗ trợ xem trước tiếng Việt",
-      "category": "Design System",
-      "period": "2025",
-      "role": "Creator",
-      "thumbnailUrl": "",
-      "galleryUrls": [],
-      "shortDescription": "Công cụ nhỏ giúp lập trình viên kiểm tra nhanh độ tương phản chữ tiếng Việt có dấu trên nền sáng/tối trước khi đưa vào Design System.",
-      "cvSummary": "Tạo công cụ kiểm tra tương phản màu WCAG với mẫu chữ tiếng Việt.",
-      "caseStudy": {
-        "problem": "Nhiều bảng màu đẹp nhưng khi hiển thị dấu tiếng Việt trên màn hình độ phân giải thường bị mờ hoặc chói mắt.",
-        "solution": "Xây dựng trình thử nghiệm trực tiếp độ tương phản AA/AAA kết hợp xuất biến CSS chỉ bằng một cú nhấp chuột.",
-        "impact": "Hỗ trợ nhóm thiết kế nội bộ rút ngắn bước duyệt màu giao diện và được cộng đồng frontend chia sẻ rộng rãi."
-      },
-      "tags": ["CSS Variables", "Accessibility", "Side Project"],
-      "liveUrl": "https://minhanh.dev",
-      "repoUrl": "https://github.com/example/vncolorkit",
-      "featured": false,
-      "showInPortfolio": true,
-      "showInCV": false
-    },
-    {
-      "id": "proj-4",
-      "title": "Hệ thống tra cứu tài liệu nội bộ EduFlow",
-      "subtitle": "Cổng tài liệu và phân quyền tìm kiếm cho đội ngũ vận hành",
-      "category": "Enterprise UI",
-      "period": "2024",
-      "role": "Frontend Engineer",
-      "thumbnailUrl": "",
-      "galleryUrls": [],
-      "shortDescription": "Thiết kế lại luồng tra cứu quy trình vận hành giúp nhân sự mới tìm đúng biểu mẫu chỉ trong vài giây.",
-      "cvSummary": "Xây dựng cổng tra cứu tài liệu nội bộ với bộ lọc đa tiêu chí và chế độ xem gọn cho hơn 200 nhân sự.",
-      "caseStudy": {
-        "problem": "Tài liệu nội bộ nằm rải rác trên nhiều thư mục khiến nhân sự mới mất trung bình 15 phút để tìm một hướng dẫn.",
-        "solution": "Tổ chức lại cây danh mục kết hợp bộ lọc theo phòng ban, thẻ trạng thái và xem trước tài liệu ngay cạnh danh sách.",
-        "impact": "Giảm 60% số câu hỏi lặp lại gửi sang bộ phận hỗ trợ nội bộ trong tháng đầu tiên."
-      },
-      "tags": ["React", "Search UX", "Enterprise UI"],
-      "liveUrl": "",
-      "repoUrl": "",
-      "featured": false,
-      "showInPortfolio": false,
-      "showInCV": true
-    }
-  ],
-  "achievements": [
-    {
-      "id": "ach-1",
-      "title": "Giải Nhì Cuộc thi Thiết kế & Phát triển Sản phẩm Số TechSpark",
-      "issuer": "TechSpark Vietnam",
-      "date": "11/2025",
-      "category": "award",
-      "description": "Đạt giải Nhì trong 48 giờ hackathon với giải pháp giao diện hỗ trợ sinh viên lập kế hoạch học tập trực quan và kiểm tra tiến độ tự động.",
-      "cvNote": "Giải Nhì TechSpark Hackathon 2025 — Hạng mục Sản phẩm Trải nghiệm Người dùng",
-      "imageUrl": "",
-      "credentialUrl": "https://minhanh.dev",
-      "tags": ["Hackathon", "Product Design", "Giải thưởng"],
-      "featured": true,
-      "showInPortfolio": true,
-      "showInCV": true
-    },
-    {
-      "id": "ach-2",
-      "title": "Chứng chỉ Meta Front-End Developer Professional",
-      "issuer": "Coursera / Meta",
-      "date": "08/2024",
-      "category": "certificate",
-      "description": "Hoàn thành chuỗi 9 học phần về React, UI/UX nền tảng, kiểm thử giao diện và quy trình quản lý mã nguồn chuyên nghiệp.",
-      "cvNote": "Chứng chỉ Meta Front-End Developer Professional (Coursera)",
-      "imageUrl": "",
-      "credentialUrl": "https://coursera.org",
-      "tags": ["Chứng chỉ", "React", "UI/UX"],
-      "featured": false,
-      "showInPortfolio": true,
-      "showInCV": true
-    },
-    {
-      "id": "ach-3",
-      "title": "1.000+ lượt đóng góp & sao cho các dự án mã nguồn mở cá nhân",
-      "issuer": "Cộng đồng GitHub",
-      "date": "2025 – 2026",
-      "category": "milestone",
-      "description": "Duy trì thói quen chia sẻ các công cụ giao diện nhỏ gọn, có tài liệu tiếng Việt rõ ràng để người mới dễ tham khảo và tùy biến.",
-      "cvNote": "Đóng góp và duy trì các dự án UI mã nguồn mở với 1.000+ GitHub stars",
-      "imageUrl": "",
-      "credentialUrl": "https://github.com/example",
-      "tags": ["Open Source", "Cộng đồng"],
-      "featured": false,
-      "showInPortfolio": true,
-      "showInCV": false
-    }
-  ],
-  "education": [
-    {
-      "id": "edu-1",
-      "school": "Đại học Công nghệ Thông tin – ĐHQG TP.HCM",
-      "degree": "Cử nhân Kỹ thuật Phần mềm",
-      "period": "2020 – 2024",
-      "gpaOrHonors": "GPA: 3.62 / 4.0 • Tốt nghiệp loại Giỏi",
-      "details": "Đồ án tốt nghiệp 9.2/10 về Hệ thống thiết kế giao diện đa nền tảng và công cụ kiểm thử khả năng truy cập web.",
-      "showInHome": true,
-      "showInCV": true
-    }
-  ],
+  "skills": [],
+  "experiences": [],
+  "projects": [],
+  "achievements": [],
+  "education": [],
   "appearance": {
     "stylePreset": "sky",
     "skyBackdrop": "cumulus",
@@ -324,6 +67,6 @@
     "stickers": []
   },
   "studioAccess": {
-    "passwordHash": "c01f4d6f6fefb6506588c95acbbc9ab74b2e40def442ce01aa53248dddebb026"
+    "passwordHash": "61e1ecea00cd9f249e45eb38f531c281d849ef0fd3095ac77e3417141415df13"
   }
 }

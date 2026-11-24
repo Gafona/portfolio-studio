@@ -299,7 +299,7 @@ export function DataManagerPanel({
                 type="text"
                 value={ghOwner}
                 onChange={(e) => setGhOwner(e.target.value)}
-                placeholder="Gafona"
+                placeholder="your-username"
                 className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-900 outline-none focus:border-blue-500"
               />
             </label>
@@ -309,7 +309,7 @@ export function DataManagerPanel({
                 type="text"
                 value={ghRepo}
                 onChange={(e) => setGhRepo(e.target.value)}
-                placeholder="phuongthao"
+                placeholder="portfolio-studio"
                 className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-900 outline-none focus:border-blue-500"
               />
             </label>
@@ -396,7 +396,7 @@ export function DataManagerPanel({
                 </a>
               </li>
               <li>
-                2. Mục <strong>Repository access</strong> → chọn <strong>Only select repositories</strong> → chọn đúng repo <code>phuongthao</code>.
+                2. Mục <strong>Repository access</strong> → chọn <strong>Only select repositories</strong> → chọn đúng repo <code>portfolio-studio</code>.
               </li>
               <li>
                 3. Mục <strong>Permissions → Repository permissions → Contents</strong> → đổi thành <strong>Read and write</strong>.

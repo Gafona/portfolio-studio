@@ -8,11 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
-    "deploy:firebase": "npm run build && npx -y firebase-tools@latest deploy --only hosting,firestore",
-    "build:thao": "tsc -b && vite build --mode thao",
-    "build:thang": "tsc -b && vite build --mode thang",
-    "deploy:thao": "npm run build:thao && npx -y firebase-tools@latest deploy --only hosting,firestore -P thao",
-    "deploy:thang": "npm run build:thang && npx -y firebase-tools@latest deploy --only hosting,firestore -P thang"
+    "deploy:firebase": "npm run build && npx -y firebase-tools@latest deploy --only hosting,firestore"
   },
   "dependencies": {
     "firebase": "^13.4.0",

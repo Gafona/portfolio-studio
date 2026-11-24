@@ -10,13 +10,13 @@ Dữ liệu hiển thị ra **2 không gian công khai tách biệt**:
 
 ## Cách 1 (Khuyên dùng cho người không rành kỹ thuật): Triển khai lên Firebase Miễn Phí (Spark Plan)
 
-Với Firebase Spark (miễn phí **không cần thẻ tín dụng**), người dùng cuối (như chị gái bạn) chỉ cần mở link web, cuộn xuống cuối trang **nhập mật khẩu Studio**, sửa chữ/up ảnh/kéo sticker và bấm **`Lưu lên Web`** — trang web cập nhật **tức thì dưới 1 giây**, hoàn toàn không cần Token hay GitHub.
+Với Firebase Spark (miễn phí **không cần thẻ tín dụng**), chủ sở hữu chỉ cần mở link web, cuộn xuống cuối trang **nhập mật khẩu Studio**, sửa chữ/up ảnh/kéo sticker và bấm **`Lưu lên Web`** — trang web cập nhật **tức thì dưới 1 giây**, hoàn toàn không cần Token hay GitHub.
 
 ### Thiết lập 1 lần mất ~5 phút:
-1. **Tạo dự án Firebase:** Mở [console.firebase.google.com](https://console.firebase.google.com/) → **Create a project** (đặt tên/ID tuỳ ý, VD: `phuongthao`, có thể tắt Google Analytics cho nhanh).
+1. **Tạo dự án Firebase:** Mở [console.firebase.google.com](https://console.firebase.google.com/) → **Create a project** (đặt tên/ID tuỳ ý, VD: `my-portfolio`, có thể tắt Google Analytics cho nhanh).
 2. **Bật đăng nhập bằng Mật khẩu:** Vào **Authentication → Sign-in method** → bật **Email/Password** → sang tab **Users → Add user**:
-   - Email: `studio@phuongthao.app` *(khớp `VITE_FIREBASE_STUDIO_EMAIL`)*
-   - Password tạm: `17181910`
+   - Email: `studio@portfolio.app` *(khớp `VITE_FIREBASE_STUDIO_EMAIL`)*
+   - Password mặc định: tự đặt (tối thiểu 6 ký tự, VD: `00000000`, có thể đổi lại trong Studio)
 3. **Tạo cơ sở dữ liệu Firestore (Standard):** Vào **Firestore Database → Create database** → chọn **Standard edition** → chọn vùng gần Việt Nam (VD: `asia-southeast1` Singapore) → chọn **Start in production mode**.
 4. **Điền cấu hình vào `.env.local`:** Vào **Project settings (bánh răng) → Your apps → Web (`</>`)** đăng ký 1 Web App → chép 6 giá trị `firebaseConfig` vào file `.env.local` ở thư mục dự án (dựa theo `.env.example`):
    ```env
@@ -26,24 +26,24 @@ Với Firebase Spark (miễn phí **không cần thẻ tín dụng**), người 
    VITE_FIREBASE_STORAGE_BUCKET=...
    VITE_FIREBASE_MESSAGING_SENDER_ID=...
    VITE_FIREBASE_APP_ID=...
-   VITE_FIREBASE_STUDIO_EMAIL=studio@phuongthao.app
+   VITE_FIREBASE_STUDIO_EMAIL=studio@portfolio.app
    ```
-   *(Lưu ý: `.env.local` đã nằm trong `.gitignore`, không bị đẩy lên Git công khai).*
+   *(Lưu ý: `.env.local` và `.firebaserc` đều đã nằm trong `.gitignore`, không bị đẩy lên Git công khai).*
 5. **Đẩy web & quy tắc bảo mật lên Firebase:**
    ```bash
    npx.cmd firebase-tools login
-   npx.cmd firebase-tools use <project-id-cua-ban>
+   npx.cmd firebase-tools use <your-project-id>
    npm.cmd run deploy:firebase
    ```
-   Xong bước này, trang web chạy chính thức tại `https://<project-id-cua-ban>.web.app`!
+   Xong bước này, trang web chạy chính thức tại `https://<your-project-id>.web.app`!
 
 ---
 
 ## Cách 2: Chạy tĩnh trên GitHub Pages
 
-Khi không cấu hình Firebase env (`.env.local` rỗng), ứng dụng tự dùng `src/data/portfolio.json`, hỗ trợ đăng nhập bằng mật khẩu tạm `17181910` (mã băm `SHA-256`) và hỗ trợ kết nối **Đăng lên Web (1 chạm)** bằng GitHub Fine-grained Token trong mục **Dữ liệu**.
+Khi không cấu hình Firebase env (`.env.local` rỗng), ứng dụng tự dùng `src/data/portfolio.json`, hỗ trợ đăng nhập bằng mật khẩu mặc định `00000000` (mã băm `SHA-256`) và hỗ trợ kết nối **Đăng lên Web (1 chạm)** bằng GitHub Fine-grained Token trong mục **Dữ liệu**.
 
-- **Đổi link GitHub Pages:** Vào **Settings → General → Repository name** để đổi tên kho (VD: `phuongthao` → `https://gafona.github.io/phuongthao/`).
+- **Link GitHub Pages:** Tự động deploy qua GitHub Actions tại `https://<your-username>.github.io/<repo-name>/` (có thể đổi tên repo trong **Settings → General → Repository name**).
 - **Gắn tên miền riêng (`.com`, `.id.vn`...):** Hỗ trợ miễn phí cả trên Firebase Hosting và GitHub Pages.
 
 ---
