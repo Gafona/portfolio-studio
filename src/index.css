@@ -1,0 +1,410 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --accent: #1558c0;
+  --accent-text: #1558c0;
+  --accent-soft: rgba(21, 88, 192, 0.1);
+  --accent-border: rgba(21, 88, 192, 0.28);
+  --accent-contrast: #ffffff;
+  --font-heading: "Be Vietnam Pro", system-ui, -apple-system, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --bg-canvas: #f2f7fe;
+  --sky-page-bg: linear-gradient(180deg, #1153bd 0%, #3e8ce5 15%, #9fd0fb 26%, #e8f2fe 34%, #f2f7fe 46%, #fafdfe 100%);
+  --bg-surface: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.88);
+  --glass-bg: linear-gradient(155deg, rgba(255, 255, 255, 0.92) 0%, rgba(244, 249, 255, 0.82) 100%);
+  --glass-highlight: rgba(255, 255, 255, 0.96);
+  --shadow-glass: 0 14px 40px -18px rgba(13, 47, 108, 0.16);
+  --bg-subtle: #eaf1fc;
+  --ink-primary: #0c1f3c;
+  --ink-secondary: #2e476b;
+  --ink-muted: #445d80;
+  --border-subtle: rgba(21, 88, 192, 0.14);
+  --border-strong: rgba(21, 88, 192, 0.3);
+  --shadow-card: 0 8px 28px -12px rgba(12, 31, 60, 0.1);
+  --radius-card: 1.375rem;
+  --radius-btn: 9999px;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.text-accent-safe {
+  color: var(--accent-text, var(--accent));
+}
+
+.bg-accent {
+  background-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.bg-accent-soft {
+  background-color: var(--accent-soft);
+}
+
+.border-accent {
+  border-color: var(--accent-border);
+}
+
+.surface-canvas {
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+}
+
+.sky-page-canvas {
+  background: var(--sky-page-bg, var(--bg-canvas));
+  color: var(--ink-primary);
+}
+
+.surface-card {
+  background-color: var(--bg-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.surface-glass {
+  background: var(--glass-bg, var(--bg-glass));
+  backdrop-filter: blur(20px) saturate(135%);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight, rgba(255, 255, 255, 0.7)),
+    var(--shadow-glass, var(--shadow-card));
+}
+
+.surface-subtle {
+  background-color: var(--bg-subtle);
+}
+
+.ink-primary {
+  color: var(--ink-primary);
+}
+
+.ink-secondary {
+  color: var(--ink-secondary);
+}
+
+.ink-muted {
+  color: var(--ink-muted);
+}
+
+.border-token {
+  border-color: var(--border-subtle);
+}
+
+.border-token-strong {
+  border-color: var(--border-strong);
+}
+
+.radius-card {
+  border-radius: var(--radius-card);
+}
+
+.radius-btn {
+  border-radius: var(--radius-btn);
+}
+
+/* Bespoke Sky & Clouds sculpted tactile buttons */
+.sky-btn-primary {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--accent);
+  color: var(--accent-contrast);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    0 10px 24px -10px var(--accent-border);
+  transition: transform 200ms ease, box-shadow 200ms ease, opacity 200ms ease;
+}
+
+.sky-btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 22%, rgba(255, 255, 255, 0.28) 50%, transparent 78%);
+  transform: translateX(-110%);
+  transition: transform 550ms ease;
+  pointer-events: none;
+}
+
+.sky-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 14px 28px -10px var(--accent-border);
+}
+
+.sky-btn-primary:hover::after {
+  transform: translateX(110%);
+}
+
+.sky-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.sky-btn-glass {
+  background: var(--glass-bg, var(--bg-glass));
+  color: var(--ink-primary);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(16px) saturate(135%);
+  -webkit-backdrop-filter: blur(16px) saturate(135%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight, rgba(255, 255, 255, 0.7)),
+    0 6px 20px -10px rgba(12, 31, 60, 0.14);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.sky-btn-glass:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.sky-btn-glass:active {
+  transform: scale(0.98);
+}
+
+.timeline-spine {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--accent-border) 8%,
+    var(--border-strong) 90%,
+    transparent
+  );
+}
+
+.spine-shimmer::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 120px;
+  top: -120px;
+  background: linear-gradient(to bottom, transparent, var(--accent-text, var(--accent)), transparent);
+  opacity: 0.42;
+  animation: spineShimmer 9s linear infinite;
+}
+
+.starfield-layer {
+  background-image:
+    radial-gradient(1px 1px at 14% 18%, rgba(255, 255, 255, 0.72) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 38% 12%, rgba(219, 234, 254, 0.8) 50%, transparent 100%),
+    radial-gradient(1px 1px at 67% 22%, rgba(255, 255, 255, 0.6) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 84% 15%, rgba(224, 242, 254, 0.75) 50%, transparent 100%),
+    radial-gradient(1px 1px at 26% 42%, rgba(255, 255, 255, 0.48) 50%, transparent 100%),
+    radial-gradient(1px 1px at 78% 48%, rgba(255, 255, 255, 0.42) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 52% 65%, rgba(219, 234, 254, 0.5) 50%, transparent 100%);
+  background-size: 460px 460px;
+}
+
+/* GPU-friendly Sky & Cloud Animations */
+@keyframes cloudDriftA {
+  0%, 100% {
+    transform: translate3d(-2%, 0, 0);
+  }
+  50% {
+    transform: translate3d(2.5%, -6px, 0);
+  }
+}
+
+@keyframes cloudDriftB {
+  0%, 100% {
+    transform: translate3d(2%, 0, 0);
+  }
+  50% {
+    transform: translate3d(-2.5%, 5px, 0);
+  }
+}
+
+@keyframes orbitSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes shootingStar {
+  0%, 72% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.8);
+  }
+  78% {
+    opacity: 0.85;
+  }
+  92% {
+    opacity: 0;
+    transform: translate3d(-170px, 76px, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-170px, 76px, 0);
+  }
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes paperPlaneGlide {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-3deg);
+  }
+  50% {
+    transform: translate3d(18px, -10px, 0) rotate(2deg);
+  }
+}
+
+@keyframes spineShimmer {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(900px);
+  }
+}
+
+@keyframes stickerWiggle {
+  0%, 100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes stickerPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.94;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+.animate-cloud-a {
+  animation: cloudDriftA 28s ease-in-out infinite;
+}
+
+.animate-cloud-b {
+  animation: cloudDriftB 36s ease-in-out infinite;
+}
+
+.animate-orbit-slow {
+  animation: orbitSlow 32s linear infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 4.2s ease-in-out infinite;
+}
+
+.animate-shooting-star {
+  animation: shootingStar 12s ease-out infinite;
+}
+
+.animate-float-gentle {
+  animation: floatGentle 4.8s ease-in-out infinite;
+}
+
+.animate-plane-glide {
+  animation: paperPlaneGlide 9s ease-in-out infinite;
+}
+
+.animate-sticker-wiggle {
+  animation: stickerWiggle 3.2s ease-in-out infinite;
+}
+
+.animate-sticker-pulse {
+  animation: stickerPulse 3.6s ease-in-out infinite;
+}
+
+.animate-spin-very-slow {
+  animation: orbitSlow 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cloud-a,
+  .animate-cloud-b,
+  .animate-orbit-slow,
+  .animate-twinkle,
+  .animate-shooting-star,
+  .animate-float-gentle,
+  .animate-plane-glide,
+  .animate-sticker-wiggle,
+  .animate-sticker-pulse,
+  .animate-spin-very-slow,
+  .spine-shimmer::after,
+  .sky-btn-primary::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #18181b !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .cv-sheet {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .cv-entry {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
