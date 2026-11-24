@@ -1,6 +1,11 @@
 import { useRef, useState } from 'react';
 import { ImagePlus, Link2, Loader2, Trash2, UploadCloud } from 'lucide-react';
-import { resolveAssetUrl } from '../utils/assets';
+import { registerPreviewAsset, resolveAssetUrl } from '../utils/assets';
+import {
+  isGitHubPublishConfigured,
+  loadGitHubSyncConfig,
+  uploadImageToGitHub,
+} from '../utils/githubPublish';
 
 interface ImageUploaderProps {
   label: string;
@@ -73,10 +78,35 @@ export function ImageUploader({
         return;
       }
 
+      const ghConfig = loadGitHubSyncConfig();
+      if (isGitHubPublishConfigured(ghConfig)) {
+        setUploading(true);
+        try {
+          const result = await uploadImageToGitHub(
+            ghConfig,
+            file.name || 'pasted-image.png',
+            dataUrl,
+          );
+          if (!result.ok || !result.path) {
+            onNotify?.('error', result.error ?? 'Tải ảnh trực tiếp lên GitHub thất bại.');
+            return;
+          }
+          registerPreviewAsset(result.path, dataUrl);
+          onChange(result.path);
+          onNotify?.(
+            'success',
+            `Đã tải ảnh lên GitHub (${result.path}). Bấm "Đăng lên Web" khi chỉnh xong.`,
+          );
+        } finally {
+          setUploading(false);
+        }
+        return;
+      }
+
       if (file.size > MAX_INLINE_DATAURL_BYTES) {
         onNotify?.(
           'error',
-          'Đang ở chế độ không có dev server: ảnh nhúng trực tiếp nên dưới 150KB, hoặc dán đường dẫn URL ảnh.',
+          'Chưa kết nối GitHub: ảnh nhúng trực tiếp nên dưới 150KB, hoặc vào mục Dữ liệu kết nối GitHub để tải ảnh tới 5MB.',
         );
         return;
       }

@@ -1,3 +1,11 @@
+const previewAssetOverrides = new Map<string, string>();
+
+export function registerPreviewAsset(relativePath: string, previewDataUrl: string): void {
+  const normalized = relativePath.trim().replace(/^\/+/, '');
+  if (!normalized || !previewDataUrl) return;
+  previewAssetOverrides.set(normalized, previewDataUrl);
+}
+
 export function resolveAssetUrl(src?: string): string {
   const trimmed = src?.trim() ?? '';
   if (!trimmed) return '';
@@ -10,9 +18,14 @@ export function resolveAssetUrl(src?: string): string {
     return trimmed;
   }
 
-  const base = import.meta.env.BASE_URL || '/';
-  const normalizedBase = base.endsWith('/') ? base : `${base}/`;
   const normalizedSrc = trimmed.replace(/^\/+/, '');
+  const immediatePreview = previewAssetOverrides.get(normalizedSrc);
+  if (immediatePreview) {
+    return immediatePreview;
+  }
+
+  const base = (typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL) || '/';
+  const normalizedBase = base.endsWith('/') ? base : `${base}/`;
   return `${normalizedBase}${normalizedSrc}`;
 }
 

@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import bundledData from '../data/portfolio.json';
 import type { PortfolioData, ThemeMode } from '../types/portfolio';
+import {
+  clearGitHubSyncConfig,
+  isGitHubPublishConfigured,
+  loadGitHubSyncConfig,
+  publishPortfolioToGitHub,
+  saveGitHubSyncConfig,
+  type GitHubSyncConfig,
+} from '../utils/githubPublish';
 import { createBlankPortfolioData, normalizePortfolioData } from '../utils/normalize';
 import { IS_STUDIO_ENABLED } from './useHashRoute';
 
@@ -83,7 +91,7 @@ function loadInitialStudioState(): {
 
 export interface SaveResult {
   ok: boolean;
-  destination: 'project' | 'local' | 'error';
+  destination: 'project' | 'github' | 'local' | 'error';
   message: string;
 }
 
@@ -96,6 +104,8 @@ export function usePortfolioStore(studioUnlocked = false) {
   const [isDirty, setIsDirty] = useState<boolean>(initialState.isDirty);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [canSaveLocally, setCanSaveLocally] = useState<boolean>(false);
+  const [githubConfig, setGithubConfig] = useState<GitHubSyncConfig>(loadGitHubSyncConfig);
+  const canPublishToGitHub = isGitHubPublishConfigured(githubConfig);
 
   const [visitorThemeOverride, setVisitorThemeOverride] = useState<ThemeMode | null>(() => {
     if (typeof window === 'undefined') return null;
@@ -206,6 +216,16 @@ export function usePortfolioStore(studioUnlocked = false) {
     persistDraft(next, savedSnapshot);
   }, [data, future, persistDraft, savedSnapshot]);
 
+  const updateGitHubConfig = useCallback((next: GitHubSyncConfig) => {
+    saveGitHubSyncConfig(next);
+    setGithubConfig(loadGitHubSyncConfig());
+  }, []);
+
+  const disconnectGitHub = useCallback(() => {
+    clearGitHubSyncConfig();
+    setGithubConfig(loadGitHubSyncConfig());
+  }, []);
+
   const saveToProject = useCallback(async (): Promise<SaveResult> => {
     if (!IS_STUDIO_ENABLED) {
       return {
@@ -216,6 +236,39 @@ export function usePortfolioStore(studioUnlocked = false) {
     }
 
     if (!canSaveLocally) {
+      if (canPublishToGitHub) {
+        setIsSaving(true);
+        try {
+          const pubRes = await publishPortfolioToGitHub(githubConfig, data);
+          if (!pubRes.ok) {
+            return {
+              ok: false,
+              destination: 'error',
+              message: pubRes.message,
+            };
+          }
+          const committed = {
+            ...clonePortfolioData(data),
+            updatedAt: pubRes.updatedAt ?? new Date().toISOString(),
+          };
+          setDataState(committed);
+          setSavedSnapshot(committed);
+          setIsDirty(false);
+          try {
+            window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+          } catch {
+            // Ignore storage errors
+          }
+          return {
+            ok: true,
+            destination: 'github',
+            message: pubRes.message,
+          };
+        } finally {
+          setIsSaving(false);
+        }
+      }
+
       try {
         window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(data));
       } catch {
@@ -225,7 +278,7 @@ export function usePortfolioStore(studioUnlocked = false) {
         ok: true,
         destination: 'local',
         message:
-          'Đang chạy ở trình duyệt (không kết nối dev server): đã lưu bản nháp vào bộ nhớ trình duyệt. Hãy dùng Export JSON để tải file về.',
+          'Đã lưu nháp trên trình duyệt. Hãy vào mục "Dữ liệu → Kết nối đăng web trực tiếp" để bấm 1 chạm tự cập nhật lên web, hoặc Export JSON.',
       };
     }
 
@@ -302,7 +355,7 @@ export function usePortfolioStore(studioUnlocked = false) {
     } finally {
       setIsSaving(false);
     }
-  }, [canSaveLocally, data]);
+  }, [canPublishToGitHub, canSaveLocally, data, githubConfig]);
 
   const exportJson = useCallback(() => {
     const blob = new Blob([`${JSON.stringify(data, null, 2)}\n`], {
@@ -383,12 +436,16 @@ export function usePortfolioStore(studioUnlocked = false) {
     isDirty,
     isSaving,
     canSaveLocally,
+    canPublishToGitHub,
+    githubConfig,
     canUndo: past.length > 0,
     canRedo: future.length > 0,
     undo,
     redo,
     setData,
     updateData,
+    updateGitHubConfig,
+    disconnectGitHub,
     saveToProject,
     exportJson,
     importJson,

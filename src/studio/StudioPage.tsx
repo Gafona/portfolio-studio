@@ -31,6 +31,7 @@ import type {
   StudioSectionId,
 } from '../types/portfolio';
 import { createId } from '../utils/assets';
+import type { GitHubSyncConfig } from '../utils/githubPublish';
 import { getThemeStyle } from '../utils/theme';
 import { AppearanceEditor } from './AppearanceEditor';
 import { ContentEditor, type ContentEditorSection } from './ContentEditor';
@@ -42,11 +43,15 @@ interface StudioPageProps {
   isDirty: boolean;
   isSaving: boolean;
   canSaveLocally: boolean;
+  canPublishToGitHub: boolean;
+  githubConfig: GitHubSyncConfig;
   canUndo: boolean;
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
   onUpdateData: (updater: (prev: PortfolioData) => PortfolioData) => void;
+  onUpdateGitHubConfig: (next: GitHubSyncConfig) => void;
+  onDisconnectGitHub: () => void;
   onSaveToProject: () => Promise<{ ok: boolean; message: string }>;
   onExportJson: () => void;
   onImportJson: (file: File) => Promise<{ ok: boolean; message: string }>;
@@ -95,11 +100,15 @@ export default function StudioPage({
   isDirty,
   isSaving,
   canSaveLocally,
+  canPublishToGitHub,
+  githubConfig,
   canUndo,
   canRedo,
   onUndo,
   onRedo,
   onUpdateData,
+  onUpdateGitHubConfig,
+  onDisconnectGitHub,
   onSaveToProject,
   onExportJson,
   onImportJson,
@@ -317,12 +326,14 @@ export default function StudioPage({
             <span className="font-heading text-sm font-bold text-zinc-900">Studio</span>
             <span
               className={`h-2 w-2 rounded-full ${
-                canSaveLocally ? 'bg-emerald-500' : 'bg-amber-500'
+                canSaveLocally || canPublishToGitHub ? 'bg-emerald-500' : 'bg-amber-500'
               }`}
               title={
                 canSaveLocally
                   ? 'Kết nối dự án cục bộ: Lưu thẳng vào portfolio.json'
-                  : 'Chế độ trình duyệt: Lưu vào bộ nhớ tạm'
+                  : canPublishToGitHub
+                    ? `Đã kết nối GitHub (${githubConfig.owner}/${githubConfig.repo}): bấm Đăng lên Web để cập nhật ngay`
+                    : 'Chế độ trình duyệt: Lưu nháp cục bộ (vào Dữ liệu để bật Đăng lên Web 1 chạm)'
               }
             />
           </div>
@@ -406,15 +417,27 @@ export default function StudioPage({
             type="button"
             disabled={isSaving}
             onClick={handleSave}
-            title="Lưu thay đổi vào dự án (Ctrl+S)"
-            className="relative ml-1.5 inline-flex items-center gap-1.5 rounded-full bg-zinc-900 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-800 disabled:opacity-60"
+            title={
+              canSaveLocally
+                ? 'Lưu thay đổi vào dự án (Ctrl+S)'
+                : canPublishToGitHub
+                  ? 'Lưu và xuất bản thẳng lên GitHub Pages (Ctrl+S)'
+                  : 'Lưu bản nháp trình duyệt (Ctrl+S)'
+            }
+            className={`relative ml-1.5 inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold text-white transition disabled:opacity-60 ${
+              !canSaveLocally && canPublishToGitHub
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-zinc-900 hover:bg-zinc-800'
+            }`}
           >
             {isSaving ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
               <Save className="h-3.5 w-3.5" />
             )}
-            <span>{canSaveLocally ? 'Lưu' : 'Lưu nháp'}</span>
+            <span>
+              {canSaveLocally ? 'Lưu' : canPublishToGitHub ? 'Đăng lên Web' : 'Lưu nháp'}
+            </span>
             {isDirty && (
               <span
                 className="h-1.5 w-1.5 rounded-full bg-amber-400"
@@ -530,7 +553,11 @@ export default function StudioPage({
               <DataManagerPanel
                 data={data}
                 canSaveLocally={canSaveLocally}
+                canPublishToGitHub={canPublishToGitHub}
+                githubConfig={githubConfig}
                 onUpdateData={onUpdateData}
+                onUpdateGitHubConfig={onUpdateGitHubConfig}
+                onDisconnectGitHub={onDisconnectGitHub}
                 onExportJson={onExportJson}
                 onImportJson={onImportJson}
                 onLoadBlankProfile={onLoadBlankProfile}
@@ -583,7 +610,10 @@ export default function StudioPage({
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
               </div>
               <span className="font-mono text-[10px] text-zinc-500">
-                localhost:5173/#/{previewRoute}
+                {(typeof window !== 'undefined' && window.location.host
+                  ? window.location.host
+                  : 'localhost:5173')}
+                /#/{previewRoute}
               </span>
               <span className="hidden text-[10px] sm:inline">
                 {clickToEdit ? 'Chạm để sửa' : 'Xem trước'}

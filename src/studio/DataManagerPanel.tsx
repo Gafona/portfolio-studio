@@ -1,8 +1,10 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   CheckCircle2,
   Circle,
+  CloudUpload,
   Download,
+  ExternalLink,
   FilePlus2,
   KeyRound,
   Lock,
@@ -11,13 +13,18 @@ import {
   Upload,
 } from 'lucide-react';
 import type { PortfolioData, StudioSectionId } from '../types/portfolio';
+import { testGitHubConnection, type GitHubSyncConfig } from '../utils/githubPublish';
 import { getProfileCompleteness } from '../utils/normalize';
 import { hashStudioPassword, verifyStudioPassword } from '../utils/studioAuth';
 
 interface DataManagerPanelProps {
   data: PortfolioData;
   canSaveLocally: boolean;
+  canPublishToGitHub: boolean;
+  githubConfig: GitHubSyncConfig;
   onUpdateData: (updater: (prev: PortfolioData) => PortfolioData) => void;
+  onUpdateGitHubConfig: (next: GitHubSyncConfig) => void;
+  onDisconnectGitHub: () => void;
   onExportJson: () => void;
   onImportJson: (file: File) => Promise<{ ok: boolean; message: string }>;
   onLoadBlankProfile: () => void;
@@ -30,7 +37,11 @@ interface DataManagerPanelProps {
 export function DataManagerPanel({
   data,
   canSaveLocally,
+  canPublishToGitHub,
+  githubConfig,
   onUpdateData,
+  onUpdateGitHubConfig,
+  onDisconnectGitHub,
   onExportJson,
   onImportJson,
   onLoadBlankProfile,
@@ -46,6 +57,48 @@ export function DataManagerPanel({
   const [confirmPwd, setConfirmPwd] = useState('');
   const [pwdError, setPwdError] = useState('');
   const [pwdUpdating, setPwdUpdating] = useState(false);
+
+  const [ghOwner, setGhOwner] = useState(githubConfig.owner);
+  const [ghRepo, setGhRepo] = useState(githubConfig.repo);
+  const [ghBranch, setGhBranch] = useState(githubConfig.branch);
+  const [ghToken, setGhToken] = useState(githubConfig.token);
+  const [ghTesting, setGhTesting] = useState(false);
+  const [ghError, setGhError] = useState('');
+  const [showTokenGuide, setShowTokenGuide] = useState(false);
+
+  useEffect(() => {
+    setGhOwner(githubConfig.owner);
+    setGhRepo(githubConfig.repo);
+    setGhBranch(githubConfig.branch);
+    setGhToken(githubConfig.token);
+  }, [githubConfig]);
+
+  const handleGitHubConnect = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (ghTesting) return;
+    setGhError('');
+    const candidate: GitHubSyncConfig = {
+      owner: ghOwner.trim(),
+      repo: ghRepo.trim(),
+      branch: ghBranch.trim() || 'main',
+      token: ghToken.trim(),
+    };
+    setGhTesting(true);
+    try {
+      const check = await testGitHubConnection(candidate);
+      if (!check.ok) {
+        setGhError(check.message);
+        return;
+      }
+      onUpdateGitHubConfig(candidate);
+      onNotify(
+        'success',
+        `${check.message} Từ giờ bấm nút "Đăng lên Web" ở góc trên để cập nhật thẳng cho mọi người.`,
+      );
+    } finally {
+      setGhTesting(false);
+    }
+  };
 
   const handlePasswordSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -157,6 +210,148 @@ export function DataManagerPanel({
               </span>
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Direct 1-Click GitHub Web Publishing */}
+      <div className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h3 className="flex items-center gap-1.5 font-heading text-sm font-bold text-zinc-900">
+              <CloudUpload className="h-4 w-4 text-blue-600" />
+              Kết nối đăng web trực tiếp (1 chạm)
+            </h3>
+            <p className="text-xs text-zinc-500">
+              Nhập Token 1 lần để nút <strong>Đăng lên Web</strong> tự đẩy chữ &amp; ảnh mới thẳng
+              lên GitHub — không cần mở code hay Git.
+            </p>
+          </div>
+          <span
+            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+              canPublishToGitHub
+                ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                : 'bg-zinc-100 text-zinc-600'
+            }`}
+          >
+            {canPublishToGitHub ? 'Đã kết nối' : 'Chưa kết nối'}
+          </span>
+        </div>
+
+        <form onSubmit={handleGitHubConnect} className="space-y-2">
+          <div className="grid grid-cols-3 gap-2">
+            <label className="space-y-0.5">
+              <span className="text-[10px] font-semibold text-zinc-600">Tài khoản (Owner)</span>
+              <input
+                type="text"
+                value={ghOwner}
+                onChange={(e) => setGhOwner(e.target.value)}
+                placeholder="Gafona"
+                className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-900 outline-none focus:border-blue-500"
+              />
+            </label>
+            <label className="space-y-0.5">
+              <span className="text-[10px] font-semibold text-zinc-600">Tên kho (Repo)</span>
+              <input
+                type="text"
+                value={ghRepo}
+                onChange={(e) => setGhRepo(e.target.value)}
+                placeholder="phuongthao"
+                className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-900 outline-none focus:border-blue-500"
+              />
+            </label>
+            <label className="space-y-0.5">
+              <span className="text-[10px] font-semibold text-zinc-600">Nhánh (Branch)</span>
+              <input
+                type="text"
+                value={ghBranch}
+                onChange={(e) => setGhBranch(e.target.value)}
+                placeholder="main"
+                className="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs text-zinc-900 outline-none focus:border-blue-500"
+              />
+            </label>
+          </div>
+
+          <label className="block space-y-0.5">
+            <span className="text-[10px] font-semibold text-zinc-600">
+              GitHub Fine-grained Token (chỉ lưu trong trình duyệt máy này)
+            </span>
+            <input
+              type="password"
+              value={ghToken}
+              onChange={(e) => {
+                setGhToken(e.target.value);
+                if (ghError) setGhError('');
+              }}
+              placeholder="github_pat_..."
+              autoComplete="off"
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-900 outline-none focus:border-blue-500"
+            />
+          </label>
+
+          {ghError && (
+            <p role="alert" className="text-[11px] font-medium text-rose-600">
+              {ghError}
+            </p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-2 pt-0.5">
+            <button
+              type="submit"
+              disabled={ghTesting}
+              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+            >
+              {ghTesting ? 'Đang kiểm tra...' : 'Kiểm tra & Lưu kết nối'}
+            </button>
+
+            {canPublishToGitHub && (
+              <button
+                type="button"
+                onClick={() => {
+                  onDisconnectGitHub();
+                  setGhError('');
+                  onNotify('info', 'Đã ngắt kết nối GitHub khỏi trình duyệt này.');
+                }}
+                className="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50"
+              >
+                Ngắt kết nối
+              </button>
+            )}
+          </div>
+        </form>
+
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowTokenGuide((prev) => !prev)}
+            className="text-[11px] font-semibold text-blue-600 hover:underline"
+          >
+            {showTokenGuide ? 'Thu gọn hướng dẫn' : 'Hướng dẫn lấy Token 1 lần (30 giây)'}
+          </button>
+
+          {showTokenGuide && (
+            <ol className="mt-2 space-y-1 rounded-lg border border-blue-100 bg-blue-50/60 p-2.5 text-[11px] leading-relaxed text-zinc-700">
+              <li>
+                1. Mở trang tạo Token:{' '}
+                <a
+                  href="https://github.com/settings/personal-access-tokens/new"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-0.5 font-semibold text-blue-700 underline"
+                >
+                  GitHub Fine-grained Tokens <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              </li>
+              <li>
+                2. Mục <strong>Repository access</strong> → chọn <strong>Only select repositories</strong> → chọn đúng repo <code>phuongthao</code>.
+              </li>
+              <li>
+                3. Mục <strong>Permissions → Repository permissions → Contents</strong> → đổi thành <strong>Read and write</strong>.
+              </li>
+              <li>
+                4. Bấm <strong>Generate token</strong>, chép mã dán vào ô trên rồi bấm <strong>Kiểm tra &amp; Lưu kết nối</strong> (chỉ làm đúng 1 lần trên máy hay dùng).
+              </li>
+            </ol>
+          )}
         </div>
       </div>
 

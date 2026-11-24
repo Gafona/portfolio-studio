@@ -28,11 +28,15 @@ export function App() {
     isDirty,
     isSaving,
     canSaveLocally,
+    canPublishToGitHub,
+    githubConfig,
     canUndo,
     canRedo,
     undo,
     redo,
     updateData,
+    updateGitHubConfig,
+    disconnectGitHub,
     saveToProject,
     exportJson,
     importJson,
@@ -143,11 +147,15 @@ export function App() {
             isDirty={isDirty}
             isSaving={isSaving}
             canSaveLocally={canSaveLocally}
+            canPublishToGitHub={canPublishToGitHub}
+            githubConfig={githubConfig}
             canUndo={canUndo}
             canRedo={canRedo}
             onUndo={undo}
             onRedo={redo}
             onUpdateData={updateData}
+            onUpdateGitHubConfig={updateGitHubConfig}
+            onDisconnectGitHub={disconnectGitHub}
             onSaveToProject={saveToProject}
             onExportJson={exportJson}
             onImportJson={importJson}

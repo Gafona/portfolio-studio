@@ -8,57 +8,37 @@ Dữ liệu tập trung tại một tệp duy nhất (`src/data/portfolio.json`)
 
 ---
 
-## Truy cập & Tùy biến Studio (Bảo vệ bằng mật khẩu)
+## Truy cập & Tự cập nhật ngay trên Web (1 chạm — Không cần đụng code)
 
-Thanh điều hướng phía trên của website công khai **không hiển thị nút Studio** để người xem không bấm nhầm.
+Thanh điều hướng phía trên của website công khai **không hiển thị nút Studio**.
 
-- Để mở trình chỉnh sửa: cuộn xuống **dưới cùng chân trang (Footer)** → nhập mật khẩu vào ô **Mật khẩu Studio** → nhấn **Vào Studio** (hoặc truy cập trực tiếp `#/studio` sau khi mở khóa).
-- **Mật khẩu tạm ban đầu:** `17181910`
-- **Đổi mật khẩu:** Sau khi vào Studio, mở mục **Dữ liệu → Mật khẩu truy cập Studio** để đặt mật khẩu riêng của bạn (hệ thống lưu mã băm `SHA-256` vào `src/data/portfolio.json`).
-- **Đổi ảnh nền tùy chỉnh:** Vào **Giao diện → Ảnh nền tùy chỉnh** để tải ảnh nền riêng (dùng chung hoặc tách riêng cho Chế độ Tối/Sáng), chọn kiểu phủ đầu trang/toàn trang, độ mờ phông và lớp phủ bảo vệ độ rõ chữ.
-- **Tự trang trí bằng Sticker:** Vào mục **Trang trí** trong Studio để chọn sticker vẽ sẵn, tải ảnh PNG nền trong suốt, nhãn chữ hoặc emoji; sau đó **kéo thả đến bất kỳ vị trí nào trên web, xoay góc, thu phóng, chỉnh lớp Nổi/Chìm và hiệu ứng** trực tiếp trên khung Xem trước.
+- **Cách mở Studio:** Cuộn xuống **dưới cùng chân trang (Footer)** → nhập mật khẩu vào ô **Mật khẩu Studio** → nhấn **Vào Studio**.
+- **Mật khẩu tạm ban đầu:** `17181910` (sau khi vào Studio, mở **Dữ liệu → Mật khẩu truy cập Studio** để đặt mật khẩu riêng; hệ thống lưu mã băm `SHA-256` vào `src/data/portfolio.json`).
+- **Đăng cập nhật trực tiếp từ Studio lên Web (không cần mở code hay Git):**
+  1. Trong Studio, mở mục **Dữ liệu → Kết nối đăng web trực tiếp (1 chạm)**.
+  2. Điền tên tài khoản GitHub, tên kho (VD: `phuongthao`), nhánh `main` và dán **GitHub Fine-grained Token** (quyền *Contents: Read and write* giới hạn riêng cho kho đó — Token chỉ lưu cục bộ trong trình duyệt máy của bạn, không bao giờ ghi vào file công khai).
+  3. Từ đó về sau mỗi lần sửa chữ, thêm dự án, tải ảnh (lưu vào `public/uploads/`) hoặc kéo thả sticker, bạn chỉ cần nhấn nút **Đăng lên Web** (`Ctrl+S`) ở góc trên bên phải — GitHub Actions sẽ tự động làm mới trang web sau ~45–60 giây.
 
-> **Dùng cho nhiều người / 2 ngành khác nhau:** Bạn và người thân (chị gái) có thể nhân bản dự án ra 2 thư mục (hoặc 2 repository GitHub riêng), vào Studio → **Dữ liệu → Bắt đầu hồ sơ trống** để nhập hoàn toàn theo ngành nghề, vai trò, dự án và phong cách riêng của từng người.
+> **Dùng cho nhiều người / 2 ngành khác nhau:** Nhân bản dự án thành kho riêng, vào Studio → **Dữ liệu → Bắt đầu hồ sơ trống** để tự điền thông tin cho bất kỳ ngành nghề nào.
 
 ---
 
-## Cài đặt & Chỉnh sửa trên máy cá nhân
+## Chỉnh sửa trên máy cá nhân (tùy chọn cho lập trình viên)
 
-Yêu cầu: đã cài [Node.js](https://nodejs.org/) (v20 trở lên).
+Yêu cầu: [Node.js](https://nodejs.org/) v20+.
 
 ```bash
-# 1. Cài thư viện (lần đầu)
 npm install
-
-# 2. Chạy web ở máy cá nhân
 npm run dev
 ```
 
-*(Trên Windows PowerShell nếu bị chặn lệnh `npm`, hãy chạy `npm.cmd install` và `npm.cmd run dev`.)*
-
-Mở `http://localhost:5173`:
-- Kéo xuống cuối trang, nhập mật khẩu để vào **Studio**.
-- Tự sửa thông tin, thêm dự án / công việc / thành tích, tải ảnh (lưu vào `public/uploads/`), đổi ảnh nền, kéo thả sticker hoặc đổi mật khẩu Studio.
-- Nhấn **Lưu** (`Ctrl+S`) để ghi thẳng vào `src/data/portfolio.json`.
+*(Trên Windows PowerShell nếu bị chặn `npm`, chạy `npm.cmd install` và `npm.cmd run dev`.)*
 
 ---
 
-## Hướng dẫn đưa lên GitHub & Public miễn phí (GitHub Pages)
+## Đẩy lên GitHub & Đổi tên miền (GitHub Pages)
 
-Dự án đã tích hợp sẵn workflow `.github/workflows/deploy.yml` để tự động build và deploy lên GitHub Pages.
+Workflow `.github/workflows/deploy.yml` tự động build (`npm run build`) và phát hành lên GitHub Pages mỗi lần nhánh `main` được cập nhật.
 
-1. **Tạo repository mới trên GitHub** (ví dụ `portfolio-ca-nhan`, hoặc tách 2 repo riêng cho 2 chị em).
-2. **Đẩy mã nguồn từ máy lên nhánh `main`:**
-   ```bash
-   git add .
-   git commit -m "Ready for GitHub deployment"
-   git branch -M main
-   git remote add origin https://github.com/<ten-tai-khoan>/<ten-repo>.git
-   git push -u origin main
-   ```
-3. **Bật GitHub Pages:**
-   - Vào **Settings → Pages** trên repository GitHub.
-   - Ở mục **Build and deployment → Source**, chọn **GitHub Actions**.
-   - Sau khoảng 1 phút, trang web sẽ tự động xuất bản tại `https://<ten-tai-khoan>.github.io/<ten-repo>/`.
-
-*(Lưu ý: Khi chạy bản tĩnh trên GitHub Pages, thay đổi trong Studio chỉ lưu nháp trên trình duyệt hiện tại. Muốn cập nhật cố định cho mọi người cùng xem, hãy nhấn **Export JSON** thay vào `src/data/portfolio.json` rồi `git push`, hoặc chạy `npm run dev` trên máy và bấm **Lưu** trước khi `git push`.)*
+- **Đổi link GitHub Pages (VD thành `https://gafona.github.io/phuongthao/`):** Vào **Settings → General → Repository name** đổi tên repo thành `phuongthao`.
+- **Gắn tên miền riêng (`.com`, `.id.vn`...):** Trỏ DNS về GitHub Pages và nhập tên miền vào **Settings → Pages → Custom domain**.
